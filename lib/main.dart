@@ -1,34 +1,33 @@
-import 'package:carteirinha_digital/qr_code_scanner.dart';
+import 'package:carteirinha_digital/screens/qr_code_scanner_screen.dart';
+import 'package:carteirinha_digital/state/theme_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(const MaterialApp(home: MyHome()));
+void main() async {
+  final themeProvider = ThemeProvider();
 
-class MyHome extends StatelessWidget {
-  const MyHome({super.key});
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: themeProvider),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Carteirinha Digital CNEC')),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const MobileScannerWidget(),
-                  ),
-                );
-              },
-              child: const Text('Escanear QR Code'),
-            ),
-          ],
-        ),
-      ),
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    return MaterialApp(
+      title: 'Carteirinha Digital',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      darkTheme: ThemeData.dark(),
+      themeMode: themeProvider.currentThemeMode,
+      home: const QRCodeScannerScreen(),
     );
   }
 }
