@@ -15,7 +15,7 @@ class ClearStorageButton extends StatelessWidget {
         Provider.of<StorageService>(context, listen: false).clearStorage();
         authProvider.checkAuthentication();
       },
-      child: const Text('Clear Storage'),
+      child: const Text('Sair'),
     );
   }
 }

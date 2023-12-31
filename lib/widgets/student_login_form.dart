@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:carteirinha_digital/state/config_provider.dart';
+import 'package:carteirinha_digital/widgets/qr_code_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carteirinha_digital/state/storage_service.dart';
@@ -28,13 +29,12 @@ class _LoginFormState extends State<LoginForm> {
     final storageService = Provider.of<StorageService>(context, listen: false);
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final qrCodeManager = Provider.of<QRCodeManager>(context, listen: false);
 
     final requestBody = jsonEncode({
       "academic_register": academicRegister,
       "password": password,
     });
-
-    print('REQUEST BODY: $requestBody !!!!');
 
     final response = await http.post(
       Uri.parse('http://$ip:8080/auth/students/signin'),
@@ -42,11 +42,11 @@ class _LoginFormState extends State<LoginForm> {
       body: requestBody,
     );
 
-    print('RESPONSE: $response !!!!');
-
     if (response.statusCode == 200) {
       final token = jsonDecode(response.body)['token'];
       await storageService.write('token', token);
+      if (!context.mounted) return;
+      await qrCodeManager.downloadAndSaveQRCode(context);
       await authProvider.checkAuthentication();
     } else {
       final errorMessage = jsonDecode(response.body)['message'];
