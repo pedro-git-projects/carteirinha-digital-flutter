@@ -12,7 +12,7 @@ class QRCodeDisplayWidget extends StatelessWidget {
 
     return imageFile != null
         ? Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(32.0),
             child: Image.file(imageFile),
           )
         : const Text('QR code indisponível');
