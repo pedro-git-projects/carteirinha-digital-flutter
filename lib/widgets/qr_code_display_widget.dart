@@ -11,8 +11,10 @@ class QRCodeDisplayWidget extends StatelessWidget {
     final imageFile = qrCodeManager.qrCodeImage;
 
     return imageFile != null
-        ? Image.file(imageFile)
-        : const Text('QR code not available');
+        ? Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Image.file(imageFile),
+          )
+        : const Text('QR code indisponível');
   }
 }
-
