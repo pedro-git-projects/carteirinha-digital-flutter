@@ -1,4 +1,4 @@
-import 'package:carteirinha_digital/widgets/student_login_form.dart';
+import 'package:carteirinha_digital/widgets/login_form.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {

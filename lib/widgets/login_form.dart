@@ -19,6 +19,7 @@ class _LoginFormState extends State<LoginForm> {
       TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  String _selectedUserType = "students";
 
   Future<void> _loginUser(BuildContext context) async {
     final academicRegister = academicRegisterController.text;
@@ -37,14 +38,21 @@ class _LoginFormState extends State<LoginForm> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final qrCodeManager = Provider.of<QRCodeManager>(context, listen: false);
 
-    final requestBody = jsonEncode({
-      "academic_register": academicRegister,
-      "password": password,
-    });
-
     try {
+      final userType = _selectedUserType;
+      String firstField = "academic_register";
+
+      if (userType == "parents" || userType == "staff") {
+        firstField = "id";
+      }
+
+      final requestBody = jsonEncode({
+        firstField: academicRegister,
+        "password": password,
+      });
+
       final response = await http.post(
-        Uri.parse('http://$ip:8080/auth/students/signin'),
+        Uri.parse('http://$ip:8080/auth/$userType/signin'),
         headers: {'Content-Type': 'application/json'},
         body: requestBody,
       );
@@ -82,6 +90,31 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          DropdownButtonFormField<String>(
+            value: _selectedUserType,
+            items: const [
+              DropdownMenuItem(
+                value: "students",
+                child: Text("Estudante"),
+              ),
+              DropdownMenuItem(
+                value: "parents",
+                child: Text("Responsável"),
+              ),
+              DropdownMenuItem(
+                value: "staff",
+                child: Text("Funcionário"),
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _selectedUserType = value!;
+              });
+            },
+            decoration: const InputDecoration(
+              labelText: 'Tipo de Usuário',
+            ),
+          ),
           TextFormField(
             controller: academicRegisterController,
             decoration: const InputDecoration(
