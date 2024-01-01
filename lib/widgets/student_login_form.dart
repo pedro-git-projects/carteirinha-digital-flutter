@@ -18,10 +18,16 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController academicRegisterController =
       TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   Future<void> _loginUser(BuildContext context) async {
     final academicRegister = academicRegisterController.text;
     final password = passwordController.text;
+
+    if (academicRegister.isEmpty || password.isEmpty) {
+      _showErrorSnackBar(context, "Preencha todos os campos!");
+      return;
+    }
 
     final config = Provider.of<ConfigProvider>(context, listen: false);
     final ip = config.ip;
@@ -36,22 +42,37 @@ class _LoginFormState extends State<LoginForm> {
       "password": password,
     });
 
-    final response = await http.post(
-      Uri.parse('http://$ip:8080/auth/students/signin'),
-      headers: {'Content-Type': 'application/json'},
-      body: requestBody,
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('http://$ip:8080/auth/students/signin'),
+        headers: {'Content-Type': 'application/json'},
+        body: requestBody,
+      );
 
-    if (response.statusCode == 200) {
-      final token = jsonDecode(response.body)['token'];
-      await storageService.write('token', token);
+      if (response.statusCode == 200) {
+        final token = jsonDecode(response.body)['token'];
+        await storageService.write('token', token);
+        if (!context.mounted) return;
+        await qrCodeManager.downloadAndSaveQRCode(context);
+        await authProvider.checkAuthentication();
+      } else {
+        final errorMessage = jsonDecode(response.body)['message'];
+        print('Failed to login: $errorMessage');
+        if (!context.mounted) return;
+        _showErrorSnackBar(context, "Falha ao fazer login");
+      }
+    } catch (error) {
       if (!context.mounted) return;
-      await qrCodeManager.downloadAndSaveQRCode(context);
-      await authProvider.checkAuthentication();
-    } else {
-      final errorMessage = jsonDecode(response.body)['message'];
-      print('Failed to login: $errorMessage');
+      _showErrorSnackBar(context, "Falha ao fazer login");
     }
+  }
+
+  void _showErrorSnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.orange,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -70,10 +91,20 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(height: 16),
           TextFormField(
             controller: passwordController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Senha',
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
+              ),
             ),
-            obscureText: true,
+            obscureText: !_isPasswordVisible,
           ),
           const SizedBox(height: 16),
           ElevatedButton(

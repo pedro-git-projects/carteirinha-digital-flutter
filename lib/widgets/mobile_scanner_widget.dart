@@ -65,6 +65,7 @@ class MobileScannerWidgetState extends State<MobileScannerWidget> {
       body: MobileScanner(
         controller: cameraController,
         onDetect: (capture) {
+          // TODO: ONCE on capture send request to record student attendance
           final List<Barcode> barcodes = capture.barcodes;
           for (final barcode in barcodes) {
             debugPrint('Barcode found! ${barcode.rawValue}');
