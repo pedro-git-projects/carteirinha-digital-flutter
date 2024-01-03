@@ -1,3 +1,4 @@
+import 'package:carteirinha_digital/widgets/drawer_menu.dart';
 import 'package:carteirinha_digital/widgets/mobile_scanner_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class QRCodeScannerScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Escanear Carteirinha'),
       ),
+      drawer: const DrawerMenu(),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

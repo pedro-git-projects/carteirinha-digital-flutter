@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:carteirinha_digital/state/config_provider.dart';
+import 'package:carteirinha_digital/state/user_type_provider.dart';
 import 'package:carteirinha_digital/widgets/qr_code_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -22,6 +23,8 @@ class _LoginFormState extends State<LoginForm> {
   String _selectedUserType = "students";
 
   Future<void> _loginUser(BuildContext context) async {
+    final userTypeProvider =
+        Provider.of<UserTypeProvider>(context, listen: false);
     final academicRegister = academicRegisterController.text;
     final password = passwordController.text;
 
@@ -40,6 +43,7 @@ class _LoginFormState extends State<LoginForm> {
 
     try {
       final userType = _selectedUserType;
+      userTypeProvider.userType = userType;
       String firstField = "academic_register";
       if (userType == "parents") {
         firstField = "id";

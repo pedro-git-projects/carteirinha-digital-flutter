@@ -1,9 +1,11 @@
 import 'package:carteirinha_digital/screens/login_screen.dart';
 import 'package:carteirinha_digital/screens/qr_code_display_screen.dart';
+import 'package:carteirinha_digital/screens/qr_code_scanner_screen.dart';
 import 'package:carteirinha_digital/state/auth_provider.dart';
 import 'package:carteirinha_digital/state/config_provider.dart';
 import 'package:carteirinha_digital/state/storage_service.dart';
 import 'package:carteirinha_digital/state/theme_provider.dart';
+import 'package:carteirinha_digital/state/user_type_provider.dart';
 import 'package:carteirinha_digital/widgets/qr_code_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,12 +21,15 @@ void main() async {
 
   final themeProvider = ThemeProvider();
 
+  final userTypeProvider = UserTypeProvider();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: configProvider),
         ChangeNotifierProvider.value(value: themeProvider),
         ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider.value(value: userTypeProvider),
         Provider.value(value: storageService),
         ChangeNotifierProvider(create: (context) => QRCodeManager()),
       ],
@@ -66,8 +71,22 @@ class _AuthWrapperState extends State<AuthWrapper> {
   @override
   Widget build(BuildContext context) {
     final authState = Provider.of<AuthProvider>(context, listen: true);
-    return authState.isAuthenticated
-        ? const QRCodeDisplayScreen()
-        : const LoginScreen();
+    final userTypeProvider =
+        Provider.of<UserTypeProvider>(context, listen: true);
+
+    if (authState.isAuthenticated) {
+      switch (userTypeProvider.userType) {
+        case "students":
+          return const QRCodeDisplayScreen();
+        case "parents":
+          return const QRCodeDisplayScreen();
+        case "staff":
+          return const QRCodeScannerScreen();
+        default:
+          return const LoginScreen();
+      }
+    } else {
+      return const LoginScreen();
+    }
   }
 }
