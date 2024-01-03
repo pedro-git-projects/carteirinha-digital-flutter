@@ -41,9 +41,10 @@ class _LoginFormState extends State<LoginForm> {
     try {
       final userType = _selectedUserType;
       String firstField = "academic_register";
-
-      if (userType == "parents" || userType == "staff") {
+      if (userType == "parents") {
         firstField = "id";
+      } else if (userType == "staff") {
+        firstField = "chapa";
       }
 
       final requestBody = jsonEncode({
@@ -90,38 +91,35 @@ class _LoginFormState extends State<LoginForm> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          DropdownButtonFormField<String>(
-            value: _selectedUserType,
-            items: const [
-              DropdownMenuItem(
-                value: "students",
-                child: Text("Estudante"),
+          Center(
+            child: ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).brightness == Brightness.dark
+                    ? Colors
+                        .white // Change to your desired color for dark theme
+                    : Colors
+                        .black, // Change to your desired color for light theme
+                BlendMode.srcIn,
               ),
-              DropdownMenuItem(
-                value: "parents",
-                child: Text("Responsável"),
+              child: Image.asset(
+                'assets/cnec-logo-branca.png',
+                width: 100.0,
+                height: 100.0,
+                fit: BoxFit.contain,
               ),
-              DropdownMenuItem(
-                value: "staff",
-                child: Text("Funcionário"),
-              ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedUserType = value!;
-              });
-            },
-            decoration: const InputDecoration(
-              labelText: 'Tipo de Usuário',
             ),
           ),
           TextFormField(
             controller: academicRegisterController,
-            decoration: const InputDecoration(
-              labelText: 'Registro Acadêmico',
+            decoration: InputDecoration(
+              labelText: _selectedUserType == "staff"
+                  ? 'Chapa'
+                  : (_selectedUserType == "parents"
+                      ? 'ID'
+                      : 'Registro Acadêmico'),
             ),
           ),
-          const SizedBox(height: 16),
+          //const SizedBox(height: 16),
           TextFormField(
             controller: passwordController,
             decoration: InputDecoration(
@@ -138,6 +136,40 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ),
             obscureText: !_isPasswordVisible,
+          ),
+          const SizedBox(height: 16),
+          const Text('Tipo de Usuário:'),
+          const SizedBox(height: 8),
+          SegmentedButton<String>(
+            segments: const <ButtonSegment<String>>[
+              ButtonSegment<String>(
+                  value: "students",
+                  label: Text(
+                    'Estudante',
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+              ButtonSegment<String>(
+                  value: "parents",
+                  label: Text(
+                    'Responsável',
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+              ButtonSegment<String>(
+                  value: "staff",
+                  label: Text(
+                    'Funcionário',
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+            ],
+            selected: <String>{_selectedUserType},
+            onSelectionChanged: (Set<String> newSelection) {
+              setState(() {
+                _selectedUserType = newSelection.first;
+              });
+            },
           ),
           const SizedBox(height: 16),
           ElevatedButton(
