@@ -1,5 +1,11 @@
+import 'dart:convert';
+
+import 'package:carteirinha_digital/state/config_provider.dart';
+import 'package:carteirinha_digital/state/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class MobileScannerWidget extends StatefulWidget {
   const MobileScannerWidget({super.key});
@@ -10,6 +16,57 @@ class MobileScannerWidget extends StatefulWidget {
 
 class MobileScannerWidgetState extends State<MobileScannerWidget> {
   MobileScannerController cameraController = MobileScannerController();
+
+  Future<void> recordAttendance(
+      BuildContext context, String studentToken) async {
+    final config = Provider.of<ConfigProvider>(context, listen: false);
+    final ip = config.ip;
+    try {
+      final String? authToken = await StorageService().read('token');
+
+      if (authToken != null) {
+        final Uri uri = Uri.parse('http://$ip:8080/auth/record-attendance');
+        final Map<String, String> headers = {
+          'Authorization': 'Bearer $authToken',
+          'Content-Type': 'application/json',
+        };
+        final Map<String, String> body = {'student_token': studentToken};
+
+        final http.Response response = await http.post(
+          uri,
+          headers: headers,
+          body: jsonEncode(body),
+        );
+
+        if (response.statusCode == 200) {
+          debugPrint('Entrada registrada com sucesso!');
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.green,
+              content: Text('Entrada registrada com sucesso!'),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.red,
+              content: Text(
+                'Falha ao registrar a entrada.',
+              ),
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        debugPrint('No authToken found.');
+      }
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -65,11 +122,14 @@ class MobileScannerWidgetState extends State<MobileScannerWidget> {
       body: MobileScanner(
         controller: cameraController,
         onDetect: (capture) {
-          // TODO: ONCE on capture send request to record student attendance
           final List<Barcode> barcodes = capture.barcodes;
           for (final barcode in barcodes) {
             debugPrint('Barcode found! ${barcode.rawValue}');
+            final studentToken = barcode.rawValue ?? '';
+            recordAttendance(context, studentToken);
           }
+          Navigator.of(context).pop();
+          cameraController.dispose();
         },
       ),
     );

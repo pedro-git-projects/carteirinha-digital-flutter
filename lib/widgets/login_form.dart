@@ -70,12 +70,13 @@ class _LoginFormState extends State<LoginForm> {
         await authProvider.checkAuthentication();
       } else {
         final errorMessage = jsonDecode(response.body)['message'];
-        print('Failed to login: $errorMessage');
+        debugPrint('Failed to login: $errorMessage');
         if (!context.mounted) return;
         _showErrorSnackBar(context, "Falha ao fazer login");
       }
     } catch (error) {
       if (!context.mounted) return;
+      debugPrint(error.toString());
       _showErrorSnackBar(context, "Falha ao fazer login");
     }
   }
