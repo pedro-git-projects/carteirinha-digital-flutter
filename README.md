@@ -1,16 +1,41 @@
-# carteirinha_digital
+# Carteirinha Digital (Frontend Mobile)
 
-A new Flutter project.
+Aplicativo Flutter para o controle de entrada de alunos utilizando carteirinhas digitais.
 
-## Getting Started
+## Conteúdo
 
-This project is a starting point for a Flutter application.
+- [Instalação](#instalação)
+- [Uso](#uso)
 
-A few resources to get you started if this is your first Flutter project:
+## Instalação
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. **Clone o repositório:**
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+   ```bash
+   git clone https://github.com/pedro-git-projects/carteirinha-digital-flutter.git
+   cd carteirinha-digital-flutter
+   ```
+
+2. **Configure o Ambiente Flutter:**
+
+   Certifique-se de ter o Flutter instalado em sua máquina. Para instalar as dependências do projeto, execute:
+
+   ```bash
+   flutter pub get
+   ```
+
+3. **Execute o Aplicativo:**
+
+   Inicie o aplicativo em seu dispositivo ou emulador:
+
+   ```bash
+   flutter run
+   ```
+
+## Uso
+
+1. Abra o aplicativo Carteirinha Digital no seu dispositivo ou emulador.
+
+2. Faça o login com suas credenciais.
+
+3. Explore as funcionalidades disponíveis, como a geração do código QR para autenticação e o registro de entrada de alunos.
